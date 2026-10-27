@@ -32,7 +32,7 @@ Laboratorio personal de ciberseguridad para practicar el trabajo de un \*\*anali
 
 Las reglas y límites del laboratorio están en \[`docs/alcance.md`](docs/alcance.md).
 
-
+![Topología de red del laboratorio](docs/topologia.png)
 
 \## Módulo 1: Gestión de vulnerabilidades
 
