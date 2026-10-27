@@ -1,0 +1,7 @@
+*.vmdk
+*.vdi
+*.ova
+*.iso
+*.vbox
+*.log
+.env

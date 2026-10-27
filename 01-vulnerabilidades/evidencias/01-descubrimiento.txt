@@ -1,0 +1,13 @@
+# Nmap 7.991 scan initiated Mon Oct 26 17:40:57 2026 as: /usr/lib/nmap/nmap -sn -oN /home/kali/lab/nmap/01-descubrimiento.txt 192.168.56.0/24
+Nmap scan report for 192.168.56.1 (192.168.56.1)
+Host is up (0.00039s latency).
+MAC Address: 0A:00:27:00:00:2D (Unknown)
+Nmap scan report for 192.168.56.100 (192.168.56.100)
+Host is up (0.00018s latency).
+MAC Address: 08:00:27:41:BE:83 (Oracle VirtualBox virtual NIC)
+Nmap scan report for 192.168.56.102 (192.168.56.102)
+Host is up (0.00044s latency).
+MAC Address: 08:00:27:2A:03:BC (Oracle VirtualBox virtual NIC)
+Nmap scan report for 192.168.56.10 (192.168.56.10)
+Host is up.
+# Nmap done at Mon Oct 26 17:40:59 2026 -- 256 IP addresses (4 hosts up) scanned in 2.12 seconds
