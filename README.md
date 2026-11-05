@@ -51,7 +51,7 @@ Red solo anfitrión `192.168.56.0/24`. La única excepción es el endpoint Windo
 | 2 · SIEM | Wazuh, agente Linux, syslog, detección de fuerza bruta | ✅ |
 | 3 · Endpoint Windows | Windows 11, Sysmon, agente Wazuh, investigación de alertas | ✅ |
 | 4 · Microsoft | Defender for Endpoint y Microsoft Sentinel, reglas propias en KQL | ⏳ |
-| 5 · Simulación de ataques | Atomic Red Team mapeado a MITRE ATT&CK (2 técnicas probadas) | 🔄 |
+| 5 · Simulación de ataques | Atomic Red Team y simulaciones manuales mapeadas a MITRE ATT&CK (3 técnicas) y primera regla propia | 🔄 |
 | 6 · Triage con IA | Script que resume y clasifica alertas con validación humana | ⏳ |
 | 7 · Informes | Informes de incidente NIST 800-61 y capa de MITRE Navigator | ⏳ |
 
@@ -129,12 +129,13 @@ Evidencia: [`03-endpoint-windows/capturas/`](03-endpoint-windows/capturas/) · I
 
 **Objetivo:** ejecutar técnicas reales de MITRE ATT&CK en mi propio endpoint y comprobar si el SIEM las detecta, y con qué calidad.
 
-Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el módulo Invoke-AtomicRedTeam, solo en la máquina virtual de Windows 11. Cada prueba se lee antes de ejecutarla (`-ShowDetails`), se ejecuta, se analiza en Wazuh y se limpia.
+Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el módulo Invoke-AtomicRedTeam, solo en la máquina virtual de Windows 11. Cada prueba se lee antes de ejecutarla (`-ShowDetails`), se ejecuta, se analiza en Wazuh y se limpia. Cuando no existe una prueba lista, la técnica se simula a mano y el informe lo indica.
 
 | Caso | Técnica | Resultado | Informe |
 |---|---|---|---|
 | 5 | T1136.001 · Cuenta local creada (Persistence) | Detectado por Sysmon (regla 92040, nivel 12) y por el registro de Seguridad (60109, 60110) | [ATOMIC-001](03-endpoint-windows/atomic-red-team/ATOMIC-001-T1136.001-cuenta-local.md) |
 | 6 | T1053.005 · Tarea programada (Persistence) | Primera vez: Windows no registró el evento 4698. Tras activar la auditoría: detectado (92032 + 60228) | [ATOMIC-002](03-endpoint-windows/atomic-red-team/ATOMIC-002-T1053.005-tarea-programada.md) |
+| 7 | T1070.001 · Borrado de registros de eventos (Defense Evasion), simulación manual | Aviso genérico de Windows (63103, nivel 5); el comando no estaba cubierto. **Regla propia 100100** (nivel 12) | [ATOMIC-003](03-endpoint-windows/atomic-red-team/ATOMIC-003-T1070.001-borrado-registros.md) · [regla](reglas-wazuh/100100-wevtutil-borrado-registros.xml) |
 
 ![Alerta de tarea programada creada](03-endpoint-windows/capturas/65-m5-wazuh-evento4698-tras-auditoria.png)
 
@@ -150,12 +151,15 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 | 4 | Alerta de nivel 12 sin causa aparente | Endpoint Windows | 92058 (nivel 12) | T1546.011 Application Shimming | [INV-001](03-endpoint-windows/investigaciones/INV-001-sdbinst-falso-positivo.md): **falso positivo** |
 | 5 | Creación de cuenta local (`net user /add`) | Atomic Red Team → Endpoint Windows | **92040** (nivel 12), 60109, 60110 | T1136.001 Local Account (Persistence) | [ATOMIC-001](03-endpoint-windows/atomic-red-team/ATOMIC-001-T1136.001-cuenta-local.md) |
 | 6 | Tarea programada para persistencia (`schtasks /Create`) | Atomic Red Team → Endpoint Windows | 92032 (nivel 3), **60228** (nivel 4) | T1053 Scheduled Task/Job (Execution, Persistence, Privilege Escalation) | [ATOMIC-002](03-endpoint-windows/atomic-red-team/ATOMIC-002-T1053.005-tarea-programada.md) |
+| 7 | Borrado de registros de eventos (`wevtutil cl`) | Simulación manual → Endpoint Windows | 63103 (nivel 5) y **100100, regla propia** (nivel 12) | T1070.001 Clear Windows Event Logs (Defense Evasion) | [ATOMIC-003](03-endpoint-windows/atomic-red-team/ATOMIC-003-T1070.001-borrado-registros.md) |
 
 **Hallazgos de analista**
 
 - **Brecha de detección (caso 2):** la ráfaga rápida de Hydra disparó la regla base 2501, pero no la regla de correlación 2502 que sí se activó con intentos manuales más lentos. Además, 2501 no trae mapeo a MITRE. Un SIEM con reglas de fábrica no cubre todos los ritmos de ataque: hace falta afinar o escribir reglas propias.
 - **Brecha de visibilidad corregida (caso 6):** Windows no registraba la creación de tareas programadas (evento 4698) porque la auditoría *Other Object Access Events* estaba desactivada. Se activó con `auditpol`, se repitió la prueba y Wazuh generó la alerta 60228. La detección dependía de la configuración del endpoint, no del SIEM.
 - **Correlación de fuentes (casos 5 y 6):** cada ataque se confirma con Sysmon (el comando y la cadena de procesos) y con el registro de Seguridad de Windows (el resultado). En el caso 6 ambos eventos están separados por 63 milisegundos.
+- **Brecha cerrada con regla propia (caso 7):** Sysmon registraba `wevtutil cl`, pero ninguna regla de fábrica lo interpretaba; solo existía el aviso genérico de Windows (evento 1102, nivel 5) y únicamente para el registro de Seguridad. Se escribió la regla 100100 sobre el comando, se validó con `wazuh-analysisd -t` y se comprobó que dispara con nivel 12 y MITRE T1070.001.
+- **Desfase de reloj (caso 7):** entre el servidor Wazuh y el endpoint hubo diferencias de entre 1 y 6 minutos en las marcas de tiempo. En un SOC real se sincroniza con NTP, porque un desfase estropea la correlación.
 - **Mapeo MITRE impreciso (caso 6):** la regla 92032 mapea también a T1087 (descubrimiento de cuentas), que no describe una tarea programada, y la 60228 mapea a la técnica padre T1053. La técnica exacta la decide el analista leyendo el comando.
 - **Falso positivo documentado (caso 4):** una alerta de nivel 12 resultó ser mantenimiento normal de Windows. Se descartó con evidencia: ruta legítima, binario de Microsoft sin renombrar, proceso padre `PcaSvc` y ausencia de archivo `.sdb`.
 
@@ -173,6 +177,8 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 | La VM de Windows empezó a reinstalarse sola | Seguía conectado el disco de la instalación desatendida | Quitar la unidad óptica y restaurar la instantánea limpia |
 | Windows Defender bloqueó el instalador de Atomic Red Team | AMSI detecta el script de instalación como malicioso | Excluir solo la carpeta `C:\AtomicRedTeam` y descargar manualmente únicamente las definiciones necesarias |
 | La descarga de las pruebas tardaba más de 15 minutos | `Invoke-WebRequest` en PowerShell 5.1 es muy lento con la barra de progreso activa | Desactivar la barra (`$ProgressPreference='SilentlyContinue'`) y bajar solo los archivos de las técnicas usadas |
+| No existía el archivo de Atomic Red Team para T1070.001 (404 dos veces) | La ruta estándar del repositorio no contiene esa técnica | Simulación manual con `wevtutil`, indicada como tal en el informe |
+| No se podía copiar y pegar comandos en la VM de Windows | Sin portapapeles compartido entre el anfitrión y la VM | Conexión SSH al servidor Wazuh desde el anfitrión, donde sí se pega |
 | No aparecía el evento de tarea programada (4698) | La auditoría de Windows para ese evento estaba desactivada | Activar la subcategoría con `auditpol` y repetir la prueba |
 | La búsqueda de Wazuh no encontraba `schtasks` | Los filtros distinguen mayúsculas y el comando se registró como `SCHTASKS` | Buscar por la imagen (`data.win.eventdata.image:*schtasks.exe`) |
 | Nessus Essentials no permite exportar informes | Limitación de la licencia gratuita | Capturas de la vista completa y armado de un PDF de evidencia |
@@ -180,7 +186,7 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 
 ## Próximos pasos
 
-1. **Más técnicas con Atomic Red Team** (borrado de registros, otras variantes de persistencia) y reglas propias de Wazuh para las brechas encontradas.
+1. **Más técnicas con Atomic Red Team** (otras variantes de persistencia y de evasión de defensas) y más reglas propias de Wazuh para las brechas encontradas.
 2. **Microsoft Defender for Endpoint y Microsoft Sentinel** con el mismo endpoint, y reglas de detección propias en KQL.
 3. **Triage asistido por IA:** script que resume una alerta, la mapea a MITRE y propone una respuesta, siempre con validación humana.
 4. **Informes de incidente** en formato NIST 800-61 y capa de MITRE ATT&CK Navigator.
@@ -190,6 +196,7 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 ```text
 soc-home-lab/
 ├── docs/                       alcance y topología
+├── reglas-wazuh/               reglas propias de detección (XML)
 ├── 00-infraestructura/
 │   └── capturas/
 ├── 01-vulnerabilidades/
@@ -203,7 +210,7 @@ soc-home-lab/
 └── 03-endpoint-windows/
     ├── capturas/
     ├── investigaciones/        INV-001: alerta investigada
-    └── atomic-red-team/        ATOMIC-001 y ATOMIC-002: técnicas simuladas y detectadas
+    └── atomic-red-team/        ATOMIC-001, 002 y 003: técnicas simuladas y detectadas
 ```
 
 ## Aviso ético

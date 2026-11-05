@@ -1,0 +1,18 @@
+<!--
+  Regla propia 100100 · Borrado de registros de eventos con wevtutil
+  MITRE ATT&CK: T1070.001 (Defense Evasion)
+  Se agrega al final de /var/ossec/etc/rules/local_rules.xml en el servidor Wazuh.
+  Base: regla 61603 (Sysmon evento 1, proceso creado).
+  Validar antes de reiniciar:  /var/ossec/bin/wazuh-analysisd -t
+-->
+<group name="windows,sysmon,defense_evasion,">
+  <rule id="100100" level="12">
+    <if_sid>61603</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\wevtutil\.exe$</field>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)\b(cl|clear-log)\b</field>
+    <description>Event log cleared with wevtutil (possible log tampering)</description>
+    <mitre>
+      <id>T1070.001</id>
+    </mitre>
+  </rule>
+</group>
