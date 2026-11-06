@@ -1,7 +1,2 @@
-*.vmdk
-*.vdi
-*.ova
-*.iso
-*.vbox
-*.log
-.env
+__pycache__/
+*.pyc
