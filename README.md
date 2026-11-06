@@ -25,6 +25,7 @@ Laboratorio personal donde practico el trabajo de un **analista SOC Nivel 1**: d
 | Despliegue y troubleshooting de un SIEM (Wazuh), agentes y syslog | [Módulo 2](#módulo-2--siem-con-wazuh) |
 | Telemetría de endpoint Windows con Sysmon | [Módulo 3](#módulo-3--endpoint-windows-con-sysmon) |
 | Detección de ataques con mapeo MITRE ATT&CK | [Casos de detección](#casos-de-detección) |
+| Triage de alertas con IA local y seguridad de IA (anonimización, prompt injection, evaluación honesta) | [Módulo 6](#módulo-6--triage-de-alertas-con-ia-local) · [`04-triage-ia`](04-triage-ia/README.md) |
 | Investigación y triage de alertas (falso positivo documentado) | [`INV-001`](03-endpoint-windows/investigaciones/INV-001-sdbinst-falso-positivo.md) |
 
 ## Arquitectura
@@ -51,8 +52,8 @@ Red solo anfitrión `192.168.56.0/24`. La única excepción es el endpoint Windo
 | 2 · SIEM | Wazuh, agente Linux, syslog, detección de fuerza bruta | ✅ |
 | 3 · Endpoint Windows | Windows 11, Sysmon, agente Wazuh, investigación de alertas | ✅ |
 | 4 · Microsoft | Defender for Endpoint y Microsoft Sentinel, reglas propias en KQL | ⏳ |
-| 5 · Simulación de ataques | Atomic Red Team y simulaciones manuales mapeadas a MITRE ATT&CK (3 técnicas) y primera regla propia | 🔄 |
-| 6 · Triage con IA | Script que resume y clasifica alertas con validación humana | ⏳ |
+| 5 · Simulación de ataques | Atomic Red Team y simulaciones manuales mapeadas a MITRE ATT&CK (3 técnicas) y primera regla propia | ✅ |
+| 6 · Triage con IA | Script en Python con IA local (Ollama) que resume y clasifica alertas, con defensas contra prompt injection y decisión humana | ✅ |
 | 7 · Informes | Informes de incidente NIST 800-61 y capa de MITRE Navigator | ⏳ |
 
 ---
@@ -163,6 +164,23 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 - **Mapeo MITRE impreciso (caso 6):** la regla 92032 mapea también a T1087 (descubrimiento de cuentas), que no describe una tarea programada, y la 60228 mapea a la técnica padre T1053. La técnica exacta la decide el analista leyendo el comando.
 - **Falso positivo documentado (caso 4):** una alerta de nivel 12 resultó ser mantenimiento normal de Windows. Se descartó con evidencia: ruta legítima, binario de Microsoft sin renombrar, proceso padre `PcaSvc` y ausencia de archivo `.sdb`.
 
+## Módulo 6 · Triage de alertas con IA local
+
+**Objetivo:** reducir el tiempo de lectura de una alerta con un modelo de IA **local** (Ollama, `llama3.2:3b`), sin que los datos salgan del equipo y sin que la IA tome decisiones. Detalle completo: [`04-triage-ia/README.md`](04-triage-ia/README.md).
+
+| Defensa | Qué hace |
+|---|---|
+| Solo localhost | El script rechaza cualquier destino que no sea local |
+| Anonimización | Oculta contraseñas y reemplaza usuarios, equipos, IP y SID antes de consultar al modelo |
+| Anti prompt injection | Detecta y omite texto del atacante dirigido a la IA y escala la alerta como indicador hostil |
+| Salida validada | Esquema JSON y validación de cada campo |
+| Política asimétrica | Un falso positivo en alerta de nivel 12 o más exige confianza ALTA; si no, revisión humana |
+| Sin acciones automáticas | La decisión queda `PENDIENTE` para el analista |
+
+**Resultados (5 alertas, 3 ejecuciones):** la v1 respondió `NO_CONCLUYENTE` a todo. Al pedirle al modelo que **razone antes de decidir**, acertó los casos claros (3 de 5), pero marcó un falso positivo como ataque en una corrida y no reconoció el borrado de registros. La misma configuración dio resultados distintos entre corridas. En ninguna ejecución se descartó un ataque real. Sin defensas, el modelo repitió el texto de la alerta trampa; con defensas, la inyección se detectó y se escaló.
+
+Conclusión: un modelo de 3B sirve como apoyo de lectura, no como juez. Evidencia: [`04-triage-ia/resultados/`](04-triage-ia/resultados/) · [capturas 75-84](04-triage-ia/capturas/).
+
 ---
 
 ## Problemas que resolví
@@ -183,12 +201,16 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 | La búsqueda de Wazuh no encontraba `schtasks` | Los filtros distinguen mayúsculas y el comando se registró como `SCHTASKS` | Buscar por la imagen (`data.win.eventdata.image:*schtasks.exe`) |
 | Nessus Essentials no permite exportar informes | Limitación de la licencia gratuita | Capturas de la vista completa y armado de un PDF de evidencia |
 | El hash del instalador de Nessus no coincidía al pegarlo | El texto copiado venía corrupto | Verificación por captura de pantalla contra el hash oficial |
+| La IA local respondía `NO_CONCLUYENTE` a todas las alertas | El esquema pedía el veredicto antes del razonamiento y el prompt empujaba a la cautela | Campo `razonamiento` primero y prompt equilibrado; se conservan los resultados de la v1 como evidencia |
+| La evaluación de la IA daba resultados distintos entre corridas | Los modelos locales no son totalmente deterministas aunque la temperatura sea 0 y la semilla fija | Documentarlo, no confiar en una sola corrida y mantener la política de seguridad y la revisión humana |
+| `python` no se encontraba en Windows | El alias de la Tienda de Windows ocupaba el comando | Instalar Python con el administrador oficial y usar `py` |
+| Se subió a GitHub un archivo `__pycache__` | Python lo genera al importar módulos | Quitarlo del repositorio y agregar `.gitignore` |
 
 ## Próximos pasos
 
 1. **Más técnicas con Atomic Red Team** (otras variantes de persistencia y de evasión de defensas) y más reglas propias de Wazuh para las brechas encontradas.
 2. **Microsoft Defender for Endpoint y Microsoft Sentinel** con el mismo endpoint, y reglas de detección propias en KQL.
-3. **Triage asistido por IA:** script que resume una alerta, la mapea a MITRE y propone una respuesta, siempre con validación humana.
+3. ~~Triage asistido por IA~~ (hecho, módulo 6). Siguiente en esa línea: probar un modelo más grande y medir la repetibilidad con varias corridas.
 4. **Informes de incidente** en formato NIST 800-61 y capa de MITRE ATT&CK Navigator.
 
 ## Estructura del repositorio
@@ -207,10 +229,16 @@ soc-home-lab/
 ├── 02-siem-wazuh/
 │   ├── capturas/
 │   └── evidencias/             reporte del agente en PDF
-└── 03-endpoint-windows/
-    ├── capturas/
-    ├── investigaciones/        INV-001: alerta investigada
-    └── atomic-red-team/        ATOMIC-001, 002 y 003: técnicas simuladas y detectadas
+├── 03-endpoint-windows/
+│   ├── capturas/
+│   ├── investigaciones/        INV-001: alerta investigada
+│   └── atomic-red-team/        ATOMIC-001, 002 y 003: técnicas simuladas y detectadas
+└── 04-triage-ia/
+    ├── triage.py               triage de alertas con IA local
+    ├── evaluar.py              evaluación con alertas conocidas y alerta trampa
+    ├── alertas/                alertas de Wazuh en JSON
+    ├── resultados/             evaluaciones v1, v2 y última
+    └── capturas/
 ```
 
 ## Aviso ético
