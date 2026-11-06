@@ -1,0 +1,102 @@
+{
+  "_index": "wazuh-alerts-4.x-2026.11.05",
+  "_id": "HPDXraEB3_m-4Lx_3klw",
+  "_score": null,
+  "_source": {
+    "input": {
+      "type": "log"
+    },
+    "agent": {
+      "ip": "192.168.56.30",
+      "name": "win11-endpoint",
+      "id": "002"
+    },
+    "manager": {
+      "name": "wazuh-server"
+    },
+    "data": {
+      "win": {
+        "eventdata": {
+          "originalFileName": "sdbinst.exe",
+          "image": "C:\\\\Windows\\\\System32\\\\sdbinst.exe",
+          "product": "Microsoft® Windows® Operating System",
+          "parentProcessGuid": "{222166d7-56ee-6aeb-3d01-000000000c00}",
+          "description": "Application Compatibility Database Installer",
+          "logonGuid": "{222166d7-5669-6aeb-e703-000000000000}",
+          "parentCommandLine": "C:\\\\WINDOWS\\\\system32\\\\svchost.exe -k LocalSystemNetworkRestricted -p -s PcaSvc",
+          "processGuid": "{222166d7-0407-6aed-e707-000000000c00}",
+          "logonId": "0x3e7",
+          "parentProcessId": "6548",
+          "processId": "720",
+          "currentDirectory": "C:\\\\WINDOWS\\\\system32\\\\",
+          "utcTime": "2026-11-05 22:32:39.622",
+          "hashes": "MD5=4CD8525C2AB9F31502301CE7D89596E7,SHA256=12CD20D87A62F4A8B2D26149A58664EF32581565813CE90D2BE103C27A784930,IMPHASH=1B6EE3C1899EA90A8A3811555E1DA64E",
+          "parentImage": "C:\\\\Windows\\\\System32\\\\svchost.exe",
+          "company": "Microsoft Corporation",
+          "commandLine": "C:\\\\WINDOWS\\\\System32\\\\sdbinst.exe -m -bg",
+          "integrityLevel": "System",
+          "fileVersion": "10.0.26100.9818 (WinBuild.160101.0800)",
+          "user": "NT AUTHORITY\\\\SYSTEM",
+          "terminalSessionId": "0",
+          "parentUser": "NT AUTHORITY\\\\SYSTEM"
+        },
+        "system": {
+          "eventID": "1",
+          "keywords": "0x8000000000000000",
+          "providerGuid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+          "level": "4",
+          "channel": "Microsoft-Windows-Sysmon/Operational",
+          "opcode": "0",
+          "message": "\"Process Create:\r\nRuleName: -\r\nUtcTime: 2026-11-05 22:32:39.622\r\nProcessGuid: {222166d7-0407-6aed-e707-000000000c00}\r\nProcessId: 720\r\nImage: C:\\Windows\\System32\\sdbinst.exe\r\nFileVersion: 10.0.26100.9818 (WinBuild.160101.0800)\r\nDescription: Application Compatibility Database Installer\r\nProduct: Microsoft® Windows® Operating System\r\nCompany: Microsoft Corporation\r\nOriginalFileName: sdbinst.exe\r\nCommandLine: C:\\WINDOWS\\System32\\sdbinst.exe -m -bg\r\nCurrentDirectory: C:\\WINDOWS\\system32\\\r\nUser: NT AUTHORITY\\SYSTEM\r\nLogonGuid: {222166d7-5669-6aeb-e703-000000000000}\r\nLogonId: 0x3E7\r\nTerminalSessionId: 0\r\nIntegrityLevel: System\r\nHashes: MD5=4CD8525C2AB9F31502301CE7D89596E7,SHA256=12CD20D87A62F4A8B2D26149A58664EF32581565813CE90D2BE103C27A784930,IMPHASH=1B6EE3C1899EA90A8A3811555E1DA64E\r\nParentProcessGuid: {222166d7-56ee-6aeb-3d01-000000000c00}\r\nParentProcessId: 6548\r\nParentImage: C:\\Windows\\System32\\svchost.exe\r\nParentCommandLine: C:\\WINDOWS\\system32\\svchost.exe -k LocalSystemNetworkRestricted -p -s PcaSvc\r\nParentUser: NT AUTHORITY\\SYSTEM\"",
+          "version": "5",
+          "systemTime": "2026-11-05T22:32:39.6296133Z",
+          "eventRecordID": "3234",
+          "threadID": "4856",
+          "computer": "WIN11-ENDPOINT",
+          "task": "1",
+          "processID": "3836",
+          "severityValue": "INFORMATION",
+          "providerName": "Microsoft-Windows-Sysmon"
+        }
+      }
+    },
+    "rule": {
+      "firedtimes": 1,
+      "mail": true,
+      "level": 12,
+      "description": "Application Compatibility Database launched",
+      "groups": [
+        "sysmon",
+        "sysmon_eid1_detections",
+        "windows"
+      ],
+      "mitre": {
+        "technique": [
+          "Application Shimming"
+        ],
+        "id": [
+          "T1546.011"
+        ],
+        "tactic": [
+          "Privilege Escalation",
+          "Persistence"
+        ]
+      },
+      "id": "92058"
+    },
+    "location": "EventChannel",
+    "decoder": {
+      "name": "windows_eventchannel"
+    },
+    "id": "1793917960.738763",
+    "timestamp": "2026-11-05T22:32:40.671+0000"
+  },
+  "fields": {
+    "timestamp": [
+      "2026-11-05T22:32:40.671Z"
+    ]
+  },
+  "sort": [
+    1793917960671
+  ]
+}

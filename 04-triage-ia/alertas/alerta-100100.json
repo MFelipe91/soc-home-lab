@@ -1,0 +1,102 @@
+{
+  "_index": "wazuh-alerts-4.x-2026.11.05",
+  "_id": "qfAVraEB3_m-4Lx_2khG",
+  "_score": null,
+  "_source": {
+    "input": {
+      "type": "log"
+    },
+    "agent": {
+      "ip": "192.168.56.30",
+      "name": "win11-endpoint",
+      "id": "002"
+    },
+    "manager": {
+      "name": "wazuh-server"
+    },
+    "data": {
+      "win": {
+        "eventdata": {
+          "originalFileName": "wevtutil.exe",
+          "image": "C:\\\\Windows\\\\System32\\\\wevtutil.exe",
+          "product": "Microsoft® Windows® Operating System",
+          "parentProcessGuid": "{222166d7-cd8c-6aec-e506-000000000c00}",
+          "description": "Windows Event Log Utility",
+          "logonGuid": "{222166d7-5672-6aeb-ef81-050000000000}",
+          "parentCommandLine": "\\\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\\"",
+          "processGuid": "{222166d7-d2a2-6aec-0107-000000000c00}",
+          "logonId": "0x581ef",
+          "parentProcessId": "2268",
+          "processId": "9680",
+          "currentDirectory": "C:\\\\WINDOWS\\\\system32\\\\",
+          "utcTime": "2026-11-05 19:01:54.908",
+          "hashes": "MD5=53419eWJh8J6Mx9DrGXKEv3ojKmqw8Cv9pscK,SHA256=ECA88A1B3C034553DA5CCC25AE81FBE3FFBF5A9CB8DD0390BECE47326F132164,IMPHASH=FFD131CC56801D723C2A27F4F49F3007",
+          "parentImage": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+          "company": "Microsoft Corporation",
+          "commandLine": "\\\"C:\\\\WINDOWS\\\\system32\\\\wevtutil.exe\\\" cl Application",
+          "integrityLevel": "High",
+          "fileVersion": "10.0.26100.9818 (WinBuild.160101.0800)",
+          "user": "WIN11-ENDPOINT\\\\analista",
+          "terminalSessionId": "1",
+          "parentUser": "WIN11-ENDPOINT\\\\analista"
+        },
+        "system": {
+          "eventID": "1",
+          "keywords": "0x8000000000000000",
+          "providerGuid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+          "level": "4",
+          "channel": "Microsoft-Windows-Sysmon/Operational",
+          "opcode": "0",
+          "message": "\"Process Create:\r\nRuleName: -\r\nUtcTime: 2026-11-05 19:01:54.908\r\nProcessGuid: {222166d7-d2a2-6aec-0107-000000000c00}\r\nProcessId: 9680\r\nImage: C:\\Windows\\System32\\wevtutil.exe\r\nFileVersion: 10.0.26100.9818 (WinBuild.160101.0800)\r\nDescription: Windows Event Log Utility\r\nProduct: Microsoft® Windows® Operating System\r\nCompany: Microsoft Corporation\r\nOriginalFileName: wevtutil.exe\r\nCommandLine: \"C:\\WINDOWS\\system32\\wevtutil.exe\" cl Application\r\nCurrentDirectory: C:\\WINDOWS\\system32\\\r\nUser: WIN11-ENDPOINT\\analista\r\nLogonGuid: {222166d7-5672-6aeb-ef81-050000000000}\r\nLogonId: 0x581EF\r\nTerminalSessionId: 1\r\nIntegrityLevel: High\r\nHashes: MD5=53419eWJh8J6Mx9DrGXKEv3ojKmqw8Cv9pscK,SHA256=ECA88A1B3C034553DA5CCC25AE81FBE3FFBF5A9CB8DD0390BECE47326F132164,IMPHASH=FFD131CC56801D723C2A27F4F49F3007\r\nParentProcessGuid: {222166d7-cd8c-6aec-e506-000000000c00}\r\nParentProcessId: 2268\r\nParentImage: C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\r\nParentCommandLine: \"C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\" \r\nParentUser: WIN11-ENDPOINT\\analista\"",
+          "version": "5",
+          "systemTime": "2026-11-05T19:01:54.9351483Z",
+          "eventRecordID": "3049",
+          "threadID": "4856",
+          "computer": "WIN11-ENDPOINT",
+          "task": "1",
+          "processID": "3836",
+          "severityValue": "INFORMATION",
+          "providerName": "Microsoft-Windows-Sysmon"
+        }
+      }
+    },
+    "rule": {
+      "firedtimes": 1,
+      "mail": true,
+      "level": 12,
+      "description": "Event log cleared with wevtutil (possible log tampering)",
+      "groups": [
+        "windows",
+        "sysmon",
+        "defense_evasion"
+      ],
+      "mitre": {
+        "technique": [
+          "Clear Windows Event Logs"
+        ],
+        "id": [
+          "T1070.001"
+        ],
+        "tactic": [
+          "Defense Evasion"
+        ]
+      },
+      "id": "100100"
+    },
+    "location": "EventChannel",
+    "decoder": {
+      "name": "windows_eventchannel"
+    },
+    "id": "1793905246.607000",
+    "full_log": "{\"win\":{\"system\":{\"providerName\":\"Microsoft-Windows-Sysmon\",\"providerGuid\":\"{5770385f-c22a-43e0-bf4c-06f5698ffbd9}\",\"eventID\":\"1\",\"version\":\"5\",\"level\":\"4\",\"task\":\"1\",\"opcode\":\"0\",\"keywords\":\"0x8000000000000000\",\"systemTime\":\"2026-11-05T19:01:54.9351483Z\",\"eventRecordID\":\"3049\",\"processID\":\"3836\",\"threadID\":\"4856\",\"channel\":\"Microsoft-Windows-Sysmon/Operational\",\"computer\":\"WIN11-ENDPOINT\",\"severityValue\":\"INFORMATION\",\"message\":\"\\\"Process Create:\\r\\nRuleName: -\\r\\nUtcTime: 2026-11-05 19:01:54.908\\r\\nProcessGuid: {222166d7-d2a2-6aec-0107-000000000c00}\\r\\nProcessId: 9680\\r\\nImage: C:\\\\Windows\\\\System32\\\\wevtutil.exe\\r\\nFileVersion: 10.0.26100.9818 (WinBuild.160101.0800)\\r\\nDescription: Windows Event Log Utility\\r\\nProduct: Microsoft® Windows® Operating System\\r\\nCompany: Microsoft Corporation\\r\\nOriginalFileName: wevtutil.exe\\r\\nCommandLine: \\\"C:\\\\WINDOWS\\\\system32\\\\wevtutil.exe\\\" cl Application\\r\\nCurrentDirectory: C:\\\\WINDOWS\\\\system32\\\\\\r\\nUser: WIN11-ENDPOINT\\\\analista\\r\\nLogonGuid: {222166d7-5672-6aeb-ef81-050000000000}\\r\\nLogonId: 0x581EF\\r\\nTerminalSessionId: 1\\r\\nIntegrityLevel: High\\r\\nHashes: MD5=53419eWJh8J6Mx9DrGXKEv3ojKmqw8Cv9pscK,SHA256=ECA88A1B3C034553DA5CCC25AE81FBE3FFBF5A9CB8DD0390BECE47326F132164,IMPHASH=FFD131CC56801D723C2A27F4F49F3007\\r\\nParentProcessGuid: {222166d7-cd8c-6aec-e506-000000000c00}\\r\\nParentProcessId: 2268\\r\\nParentImage: C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\r\\nParentCommandLine: \\\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\\\" \\r\\nParentUser: WIN11-ENDPOINT\\\\analista\\\"\"},\"eventdata\":{\"utcTime\":\"2026-11-05 19:01:54.908\",\"processGuid\":\"{222166d7-d2a2-6aec-0107-000000000c00}\",\"processId\":\"9680\",\"image\":\"C:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\wevtutil.exe\",\"fileVersion\":\"10.0.26100.9818 (WinBuild.160101.0800)\",\"description\":\"Windows Event Log Utility\",\"product\":\"Microsoft® Windows® Operating System\",\"company\":\"Microsoft Corporation\",\"originalFileName\":\"wevtutil.exe\",\"commandLine\":\"\\\\\\\"C:\\\\\\\\WINDOWS\\\\\\\\system32\\\\\\\\wevtutil.exe\\\\\\\" cl Application\",\"currentDirectory\":\"C:\\\\\\\\WINDOWS\\\\\\\\system32\\\\\\\\\",\"user\":\"WIN11-ENDPOINT\\\\\\\\analista\",\"logonGuid\":\"{222166d7-5672-6aeb-ef81-050000000000}\",\"logonId\":\"0x581ef\",\"terminalSessionId\":\"1\",\"integrityLevel\":\"High\",\"hashes\":\"MD5=53419eWJh8J6Mx9DrGXKEv3ojKmqw8Cv9pscK,SHA256=ECA88A1B3C034553DA5CCC25AE81FBE3FFBF5A9CB8DD0390BECE47326F132164,IMPHASH=FFD131CC56801D723C2A27F4F49F3007\",\"parentProcessGuid\":\"{222166d7-cd8c-6aec-e506-000000000c00}\",\"parentProcessId\":\"2268\",\"parentImage\":\"C:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe\",\"parentCommandLine\":\"\\\\\\\"C:\\\\\\\\Windows\\\\\\\\System32\\\\\\\\WindowsPowerShell\\\\\\\\v1.0\\\\\\\\powershell.exe\\\\\\\"\",\"parentUser\":\"WIN11-ENDPOINT\\\\\\\\analista\"}}}",
+    "timestamp": "2026-11-05T19:00:46.314+0000"
+  },
+  "fields": {
+    "timestamp": [
+      "2026-11-05T19:00:46.314Z"
+    ]
+  },
+  "sort": [
+    1793905246314
+  ]
+}

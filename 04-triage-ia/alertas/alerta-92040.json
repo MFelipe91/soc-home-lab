@@ -1,0 +1,101 @@
+{
+  "_index": "wazuh-alerts-4.x-2026.11.04",
+  "_id": "0fDTp6EB3_m-4Lx_ckY1",
+  "_score": null,
+  "_source": {
+    "input": {
+      "type": "log"
+    },
+    "agent": {
+      "ip": "192.168.56.30",
+      "name": "win11-endpoint",
+      "id": "002"
+    },
+    "manager": {
+      "name": "wazuh-server"
+    },
+    "data": {
+      "win": {
+        "eventdata": {
+          "originalFileName": "net1.exe",
+          "image": "C:\\\\Windows\\\\System32\\\\net1.exe",
+          "product": "Microsoft® Windows® Operating System",
+          "parentProcessGuid": "{222166d7-79ad-6aeb-7e02-000000000c00}",
+          "description": "Net Command",
+          "logonGuid": "{222166d7-5672-6aeb-ef81-050000000000}",
+          "parentCommandLine": "net  user /add \\\"T1136.001_CMD\\\" \\\"T1136.001_CMD!\\\"",
+          "processGuid": "{222166d7-79ad-6aeb-7f02-000000000c00}",
+          "logonId": "0x581ef",
+          "parentProcessId": "6356",
+          "processId": "7036",
+          "currentDirectory": "C:\\\\Users\\\\analista\\\\AppData\\\\Local\\\\Temp\\\\",
+          "utcTime": "2026-11-04 18:30:05.939",
+          "hashes": "MD5=158DB954503C803C0840DD424FB608F8,SHA256=8489DB35375D890314EB8F7CD9E0CBD3866475F4E252865F00F649B0A02FD757,IMPHASH=98A56655C7E54BCE7F55B3F01AB5B07E",
+          "parentImage": "C:\\\\Windows\\\\System32\\\\net.exe",
+          "company": "Microsoft Corporation",
+          "commandLine": "C:\\\\WINDOWS\\\\system32\\\\net1  user /add \\\"T1136.001_CMD\\\" \\\"T1136.001_CMD!\\\"",
+          "integrityLevel": "High",
+          "fileVersion": "10.0.26100.7019 (WinBuild.160101.0800)",
+          "user": "WIN11-ENDPOINT\\\\analista",
+          "terminalSessionId": "1",
+          "parentUser": "WIN11-ENDPOINT\\\\analista"
+        },
+        "system": {
+          "eventID": "1",
+          "keywords": "0x8000000000000000",
+          "providerGuid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+          "level": "4",
+          "channel": "Microsoft-Windows-Sysmon/Operational",
+          "opcode": "0",
+          "message": "\"Process Create:\r\nRuleName: -\r\nUtcTime: 2026-11-04 18:30:05.939\r\nProcessGuid: {222166d7-79ad-6aeb-7f02-000000000c00}\r\nProcessId: 7036\r\nImage: C:\\Windows\\System32\\net1.exe\r\nFileVersion: 10.0.26100.7019 (WinBuild.160101.0800)\r\nDescription: Net Command\r\nProduct: Microsoft® Windows® Operating System\r\nCompany: Microsoft Corporation\r\nOriginalFileName: net1.exe\r\nCommandLine: C:\\WINDOWS\\system32\\net1  user /add \"T1136.001_CMD\" \"T1136.001_CMD!\"\r\nCurrentDirectory: C:\\Users\\analista\\AppData\\Local\\Temp\\\r\nUser: WIN11-ENDPOINT\\analista\r\nLogonGuid: {222166d7-5672-6aeb-ef81-050000000000}\r\nLogonId: 0x581EF\r\nTerminalSessionId: 1\r\nIntegrityLevel: High\r\nHashes: MD5=158DB954503C803C0840DD424FB608F8,SHA256=8489DB35375D890314EB8F7CD9E0CBD3866475F4E252865F00F649B0A02FD757,IMPHASH=98A56655C7E54BCE7F55B3F01AB5B07E\r\nParentProcessGuid: {222166d7-79ad-6aeb-7e02-000000000c00}\r\nParentProcessId: 6356\r\nParentImage: C:\\Windows\\System32\\net.exe\r\nParentCommandLine: net  user /add \"T1136.001_CMD\" \"T1136.001_CMD!\"\r\nParentUser: WIN11-ENDPOINT\\analista\"",
+          "version": "5",
+          "systemTime": "2026-11-04T18:30:05.9501853Z",
+          "eventRecordID": "2080",
+          "threadID": "4856",
+          "computer": "WIN11-ENDPOINT",
+          "task": "1",
+          "processID": "3836",
+          "severityValue": "INFORMATION",
+          "providerName": "Microsoft-Windows-Sysmon"
+        }
+      }
+    },
+    "rule": {
+      "firedtimes": 1,
+      "mail": true,
+      "level": 12,
+      "description": "net1.exe executed a user creation command",
+      "groups": [
+        "sysmon",
+        "sysmon_eid1_detections",
+        "windows"
+      ],
+      "mitre": {
+        "technique": [
+          "Local Account"
+        ],
+        "id": [
+          "T1136.001"
+        ],
+        "tactic": [
+          "Persistence"
+        ]
+      },
+      "id": "92040"
+    },
+    "location": "EventChannel",
+    "decoder": {
+      "name": "windows_eventchannel"
+    },
+    "id": "1793817006.452918",
+    "timestamp": "2026-11-04T18:30:06.592+0000"
+  },
+  "fields": {
+    "timestamp": [
+      "2026-11-04T18:30:06.592Z"
+    ]
+  },
+  "sort": [
+    1793817006592
+  ]
+}

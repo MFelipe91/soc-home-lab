@@ -1,0 +1,64 @@
+{
+  "archivo": "alerta-92040.json",
+  "generado": "2026-11-06T17:34:25",
+  "regla_id": "92040",
+  "regla_nivel": 12,
+  "regla_descripcion": "net1.exe executed a user creation command",
+  "inyeccion_detectada": false,
+  "campos_sospechosos": [],
+  "anonimizacion": {
+    "secretos_ocultos": 2,
+    "identidades": 6,
+    "ips": 0,
+    "sids": 0
+  },
+  "payload_enviado": {
+    "alerta": {
+      "regla_id": "92040",
+      "regla_nivel": "12",
+      "regla_descripcion": "net1.exe executed a user creation command",
+      "regla_grupos": "sysmon, sysmon_eid1_detections, windows",
+      "mitre_id": "T1136.001",
+      "mitre_tactica": "Persistence",
+      "mitre_tecnica": "Local Account",
+      "equipo": "EQUIPO_1",
+      "fecha": "2026-11-04T18:30:06.592+0000",
+      "evento_id": "1",
+      "canal": "Microsoft-Windows-Sysmon/Operational",
+      "proveedor": "Microsoft-Windows-Sysmon",
+      "imagen": "C:\\Windows\\System32\\net1.exe",
+      "linea_de_comandos": "C:\\WINDOWS\\system32\\net1 user /add \"T1136.001_CMD\" [SECRETO]",
+      "proceso_padre": "C:\\Windows\\System32\\net.exe",
+      "linea_de_comandos_padre": "net user /add \"T1136.001_CMD\" [SECRETO]",
+      "usuario": "EQUIPO_1\\USUARIO_1",
+      "usuario_padre": "EQUIPO_1\\USUARIO_1",
+      "integridad": "High",
+      "directorio_actual": "C:\\Users\\USUARIO_1\\AppData\\Local\\Temp\\",
+      "nombre_original": "net1.exe",
+      "descripcion_archivo": "Net Command",
+      "empresa": "Microsoft Corporation",
+      "sha256": "8489DB35375D890314EB8F7CD9E0CBD3866475F4E252865F00F649B0A02FD757"
+    }
+  },
+  "modelo": "llama3.2:3b",
+  "decision_analista": "PENDIENTE",
+  "duracion_s": 108.3,
+  "razonamiento": "El proceso net1.exe se ejecutó una comando de creación de usuario, lo que indica una actividad sospechosa de persistencia. El comando de creación de usuario fue ejecutado por el usuario EQUIPO_1 con el comando C:\\WINDOWS\\system32\\net1 user /add \\",
+  "veredicto_modelo": "ATAQUE_PROBABLE",
+  "confianza": "BAJA",
+  "resumen": "El proceso net1.exe ejecutó un comando de creación de usuario, lo que indica una actividad sospechosa de persistencia. La acción de creación de usuario deja persistencia y crea una cuenta nueva, lo que sugiere una actividad de ataque. Se recomienda verificar la integridad de la cuenta creada y realizar una investigación adicional para determinar la naturaleza de la actividad.",
+  "tecnica_mitre": "T1136.001",
+  "evidencia": [
+    "El proceso padre net.exe es esperable para la actividad de red, pero el comando de creación de usuario es inusual.",
+    "La acción de creación de usuario deja persistencia y crea una cuenta nueva, lo que es una característica de la técnica de persistencia.",
+    "La acción no tiene una explicación legítima de mantenimiento o administración, ya que no se relaciona con una tarea legítima de red.",
+    "La acción crea una cuenta nueva y la asigna al usuario EQUIPO_1, lo que sugiere una actividad de ataque."
+  ],
+  "acciones_recomendadas": [
+    "Verificar la integridad de la cuenta creada y realizar una investigación adicional para determinar la naturaleza de la actividad.",
+    "Revisar los logs de sistema para determinar si hay más acciones sospechosas relacionadas con esta actividad.",
+    "Realizar un análisis de la cuenta creada para determinar si se ha utilizado para realizar acciones maliciosas."
+  ],
+  "veredicto_final": "ATAQUE_PROBABLE",
+  "notas": []
+}
