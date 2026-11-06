@@ -1,0 +1,129 @@
+{
+  "name": "SOC Home Lab - cobertura de detección",
+  "versions": {
+    "attack": "20",
+    "navigator": "5.1.0",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "Técnicas ejecutadas en el laboratorio soc-home-lab (github.com/MFelipe91/soc-home-lab) y cómo las detectó Wazuh 4.14.9. Puntaje: 3 detectado con severidad alta o regla propia; 2 detectado con severidad media o tras corregir la configuración; 1 detección débil o parcial; 0 investigado como falso positivo.",
+  "sorting": 3,
+  "layout": {
+    "layout": "side",
+    "showID": true,
+    "showName": true,
+    "showAggregateScores": false
+  },
+  "hideDisabled": false,
+  "techniques": [
+    {
+      "techniqueID": "T1136.001",
+      "score": 3,
+      "color": "#31a354",
+      "comment": "Caso 5 (ATOMIC-001): net user /add. Regla 92040 nivel 12 + eventos de Seguridad 60109/60110.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1685.005",
+      "score": 3,
+      "color": "#31a354",
+      "comment": "Caso 7 (ATOMIC-003, IR-002): wevtutil cl. Regla de fábrica 63103 solo nivel 5; regla propia 100100 nivel 12. Wazuh lo mapea como T1070.001, revocada en ATT&CK v19 y reemplazada por esta.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1053.005",
+      "score": 2,
+      "color": "#a1d99b",
+      "comment": "Caso 6 (ATOMIC-002, IR-001): schtasks /Create. Sin evento 4698 hasta activar auditpol; luego 92032 (3) + 60228 (4).",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1110",
+      "score": 2,
+      "color": "#a1d99b",
+      "comment": "Caso 1: fallos de login SSH repetidos. Regla de correlación 2502 nivel 10.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 1,
+      "color": "#fdae6b",
+      "comment": "Caso 2: Hydra contra Metasploitable. Solo regla 2501 nivel 5 sin MITRE; la correlación 2502 no se activó: brecha.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1087.001",
+      "score": 1,
+      "color": "#fdae6b",
+      "comment": "Caso 3: net user. Reglas 92031/92033 nivel 3.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1033",
+      "score": 1,
+      "color": "#fdae6b",
+      "comment": "Caso 3: whoami /all. Reglas 92031/92033 nivel 3.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 1,
+      "color": "#fdae6b",
+      "comment": "Caso 3: ipconfig /all. Reglas 92031/92033 nivel 3.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1059.003",
+      "score": 1,
+      "color": "#fdae6b",
+      "comment": "Casos 5 y 6: cmd.exe en la cadena de procesos. Regla 92032 nivel 3.",
+      "enabled": true,
+      "showSubtechniques": true
+    },
+    {
+      "techniqueID": "T1546.011",
+      "score": 0,
+      "color": "#bdbdbd",
+      "comment": "Caso 4 (INV-001): alerta 92058 nivel 12 investigada y descartada como falso positivo (sdbinst lanzado por PcaSvc).",
+      "enabled": true,
+      "showSubtechniques": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#bdbdbd",
+      "#31a354"
+    ],
+    "minValue": 0,
+    "maxValue": 3
+  },
+  "legendItems": [
+    {
+      "label": "3 · Detectado: severidad alta o regla propia",
+      "color": "#31a354"
+    },
+    {
+      "label": "2 · Detectado: severidad media o tras corregir configuración",
+      "color": "#a1d99b"
+    },
+    {
+      "label": "1 · Detección débil o parcial",
+      "color": "#fdae6b"
+    },
+    {
+      "label": "0 · Investigado: falso positivo",
+      "color": "#bdbdbd"
+    }
+  ],
+  "showTacticRowBackground": false,
+  "selectTechniquesAcrossTactics": true,
+  "selectSubtechniquesWithParent": false
+}

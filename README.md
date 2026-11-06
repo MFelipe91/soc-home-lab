@@ -1,6 +1,6 @@
 # SOC Home Lab
 
-![Estado](https://img.shields.io/badge/estado-en%20progreso-blue)
+![Estado](https://img.shields.io/badge/versi%C3%B3n-1.0-brightgreen)
 ![SIEM](https://img.shields.io/badge/SIEM-Wazuh%204.14-005571)
 ![Endpoint](https://img.shields.io/badge/endpoint-Windows%2011%20%2B%20Sysmon-0078D4)
 ![Nessus](https://img.shields.io/badge/vuln%20scan-Nessus-00A9CE)
@@ -9,7 +9,7 @@
 
 Laboratorio personal donde practico el trabajo de un **analista SOC Nivel 1**: descubrir activos, evaluar vulnerabilidades, centralizar la telemetría de equipos Linux y Windows en un SIEM, detectar ataques mapeados a MITRE ATT&CK e investigar alertas. Cada módulo deja evidencia (capturas, salidas crudas e informes) para que cualquiera pueda revisar lo que hice.
 
-> **English summary:** Personal SOC Level 1 home lab. Kali Linux attacks an intentionally vulnerable target inside an isolated network; findings are assessed with Nmap and Nessus (CVSS + EPSS). Logs from Linux agents, syslog sources and a Windows 11 endpoint (Sysmon) are centralized in Wazuh SIEM to detect and investigate attacks mapped to MITRE ATT&CK. Next: Microsoft Defender XDR and Microsoft Sentinel (KQL), Atomic Red Team simulations and AI-assisted alert triage.
+> **English summary:** Personal SOC Level 1 home lab. Kali Linux attacks an intentionally vulnerable target inside an isolated network; findings are assessed with Nmap and Nessus (CVSS + EPSS). Logs from Linux agents, syslog sources and a Windows 11 endpoint (Sysmon) are centralized in Wazuh SIEM to detect and investigate attacks mapped to MITRE ATT&CK. Also included: Atomic Red Team simulations with a custom Wazuh detection rule, local-LLM alert triage with prompt-injection defenses and an honest evaluation, two NIST SP 800-61 incident reports and a MITRE ATT&CK Navigator coverage layer. Next: Microsoft Defender XDR and Microsoft Sentinel (KQL).
 
 **Autor:** Mario Felipe Busqués Araya · Ingeniero en Informática orientado a ciberseguridad
 
@@ -26,6 +26,7 @@ Laboratorio personal donde practico el trabajo de un **analista SOC Nivel 1**: d
 | Telemetría de endpoint Windows con Sysmon | [Módulo 3](#módulo-3--endpoint-windows-con-sysmon) |
 | Detección de ataques con mapeo MITRE ATT&CK | [Casos de detección](#casos-de-detección) |
 | Triage de alertas con IA local y seguridad de IA (anonimización, prompt injection, evaluación honesta) | [Módulo 6](#módulo-6--triage-de-alertas-con-ia-local) · [`04-triage-ia`](04-triage-ia/README.md) |
+| Informes de incidente en formato NIST SP 800-61 y cobertura en MITRE ATT&CK Navigator | [Módulo 7](#módulo-7--informes-de-incidente-y-cobertura-mitre) · [`05-informes-incidente`](05-informes-incidente/) |
 | Investigación y triage de alertas (falso positivo documentado) | [`INV-001`](03-endpoint-windows/investigaciones/INV-001-sdbinst-falso-positivo.md) |
 
 ## Arquitectura
@@ -54,7 +55,7 @@ Red solo anfitrión `192.168.56.0/24`. La única excepción es el endpoint Windo
 | 4 · Microsoft | Defender for Endpoint y Microsoft Sentinel, reglas propias en KQL | ⏳ |
 | 5 · Simulación de ataques | Atomic Red Team y simulaciones manuales mapeadas a MITRE ATT&CK (3 técnicas) y primera regla propia | ✅ |
 | 6 · Triage con IA | Script en Python con IA local (Ollama) que resume y clasifica alertas, con defensas contra prompt injection y decisión humana | ✅ |
-| 7 · Informes | Informes de incidente NIST 800-61 y capa de MITRE Navigator | ⏳ |
+| 7 · Informes | Dos informes de incidente (NIST SP 800-61 Rev. 3) y capa de cobertura en MITRE ATT&CK Navigator | ✅ |
 
 ---
 
@@ -181,6 +182,22 @@ Se usa [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team) con el 
 
 Conclusión: un modelo de 3B sirve como apoyo de lectura, no como juez. Evidencia: [`04-triage-ia/resultados/`](04-triage-ia/resultados/) · [capturas 75-84](04-triage-ia/capturas/).
 
+## Módulo 7 · Informes de incidente y cobertura MITRE
+
+**Objetivo:** documentar los incidentes del laboratorio como lo haría un equipo de respuesta y mostrar de un vistazo qué técnicas están cubiertas. Los informes siguen [NIST SP 800-61 Rev. 3](https://csrc.nist.gov/pubs/sp/800/61/r3/final) (abril de 2025, alineada con CSF 2.0), con los nombres de fase clásicos y su equivalencia con las funciones de la Rev. 3. Son incidentes **simulados** y así se indica en cada informe.
+
+| Entregable | Contenido |
+|---|---|
+| [`IR-001`](05-informes-incidente/IR-001-persistencia-en-endpoint-windows.md) | Persistencia en endpoint: cuenta local (T1136.001) y tarea programada (T1053.005). Brecha de visibilidad corregida con `auditpol` |
+| [`IR-002`](05-informes-incidente/IR-002-borrado-de-registros-de-eventos.md) | Borrado de registros de eventos. Brecha de detección corregida con la regla propia 100100 |
+| [`mitre-navigator-soc-home-lab.json`](05-informes-incidente/mitre-navigator-soc-home-lab.json) | Capa para [ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/): 10 técnicas con un puntaje de calidad de detección |
+
+**Puntaje de la capa:** 3 = detectado con severidad alta o regla propia (T1136.001, T1685.005); 2 = detectado tras corregir la configuración o con severidad media (T1053.005, T1110); 1 = detección débil o parcial (T1110.001, T1087.001, T1033, T1016, T1059.003); 0 = investigado como falso positivo (T1546.011).
+
+**Hallazgo de versión de ATT&CK:** en la [v19](https://attack.mitre.org/resources/updates/updates-april-2026/) (abril de 2026) la táctica *Defense Evasion* se dividió en *Stealth* y *Defense Impairment*, y T1070.001 fue reemplazada por [T1685.005](https://attack.mitre.org/techniques/T1685/005/). Wazuh 4.14.9 sigue mapeando con la numeración anterior; la capa del laboratorio usa la actual.
+
+Evidencia: [`05-informes-incidente/capturas/`](05-informes-incidente/capturas/).
+
 ---
 
 ## Problemas que resolví
@@ -204,14 +221,16 @@ Conclusión: un modelo de 3B sirve como apoyo de lectura, no como juez. Evidenci
 | La IA local respondía `NO_CONCLUYENTE` a todas las alertas | El esquema pedía el veredicto antes del razonamiento y el prompt empujaba a la cautela | Campo `razonamiento` primero y prompt equilibrado; se conservan los resultados de la v1 como evidencia |
 | La evaluación de la IA daba resultados distintos entre corridas | Los modelos locales no son totalmente deterministas aunque la temperatura sea 0 y la semilla fija | Documentarlo, no confiar en una sola corrida y mantener la política de seguridad y la revisión humana |
 | `python` no se encontraba en Windows | El alias de la Tienda de Windows ocupaba el comando | Instalar Python con el administrador oficial y usar `py` |
-| Se subió a GitHub un archivo `__pycache__` | Python lo genera al importar módulos | Quitarlo del repositorio y agregar `.gitignore` |
+| Se subió a GitHub un archivo `__pycache__` | Python lo genera al importar módulos | Quitarlo del repositorio y agregar `.gitignore`, conservando las reglas que ya tenía |
+| La técnica T1070.001 no aparecía en la versión actual de MITRE ATT&CK | ATT&CK v19 la reemplazó por T1685.005 al dividir *Defense Evasion* | Consultar el sitio oficial, usar la numeración nueva en la capa y dejar la nota en el informe IR-002 |
 
 ## Próximos pasos
 
 1. **Más técnicas con Atomic Red Team** (otras variantes de persistencia y de evasión de defensas) y más reglas propias de Wazuh para las brechas encontradas.
 2. **Microsoft Defender for Endpoint y Microsoft Sentinel** con el mismo endpoint, y reglas de detección propias en KQL.
-3. ~~Triage asistido por IA~~ (hecho, módulo 6). Siguiente en esa línea: probar un modelo más grande y medir la repetibilidad con varias corridas.
-4. **Informes de incidente** en formato NIST 800-61 y capa de MITRE ATT&CK Navigator.
+3. **Triage con IA:** probar un modelo más grande y medir la repetibilidad con varias corridas.
+4. **Reglas propias** para `Clear-EventLog` (PowerShell) y para tareas programadas que ejecutan `cmd.exe` desde rutas inusuales, y sincronización NTP entre Wazuh y el endpoint.
+5. **Splunk** como segundo SIEM para comparar la detección de los mismos casos.
 
 ## Estructura del repositorio
 
@@ -233,11 +252,16 @@ soc-home-lab/
 │   ├── capturas/
 │   ├── investigaciones/        INV-001: alerta investigada
 │   └── atomic-red-team/        ATOMIC-001, 002 y 003: técnicas simuladas y detectadas
-└── 04-triage-ia/
-    ├── triage.py               triage de alertas con IA local
-    ├── evaluar.py              evaluación con alertas conocidas y alerta trampa
-    ├── alertas/                alertas de Wazuh en JSON
-    ├── resultados/             evaluaciones v1, v2 y última
+├── 04-triage-ia/
+│   ├── triage.py               triage de alertas con IA local
+│   ├── evaluar.py              evaluación con alertas conocidas y alerta trampa
+│   ├── alertas/                alertas de Wazuh en JSON
+│   ├── resultados/             evaluaciones v1, v2 y última
+│   └── capturas/
+└── 05-informes-incidente/
+    ├── IR-001-...md            incidente: persistencia en endpoint
+    ├── IR-002-...md            incidente: borrado de registros
+    ├── mitre-navigator-...json capa de cobertura para ATT&CK Navigator
     └── capturas/
 ```
 
